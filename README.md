@@ -44,7 +44,7 @@ This also upgrades boxes that do not yet have the update UI.
 curl -fsSL https://github.com/kaushalkchoudhary/orion-setup-releases/releases/latest/download/install.sh | sh
 ```
 
-Enter the release security code when prompted. It is not written to disk.
+Enter the release security code during first installation. The installer saves verified authorization in a root-only file so `orion-setup --update` does not prompt again. Older installations must supply `ORION_UPDATE_CODE` once to enable unattended updates.
 
 For an unattended installation from a root shell, supply the code directly:
 
