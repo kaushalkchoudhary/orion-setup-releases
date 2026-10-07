@@ -3,7 +3,8 @@
 Public **encrypted** updates for Linux ARM64 Radxa E20C/E24C/E52C and NanoPi R2C/R2C Plus,
 and Linux ARMv7 NanoPi R1S-H3.
 The application source stays private. No GitHub account is needed to check for or
-download updates. Ask your administrator for the release security code.
+download updates. A fresh installation requires the release security code;
+an installed published console authorizes subsequent updates automatically.
 
 ## From the box UI
 
@@ -23,8 +24,8 @@ plus the VMS relay and camera inventory. Unknown camera state is labelled;
 status does not start streams or change network configuration. Privileged commands
 invoke sudo when needed. Commands use the `--command` form.
 
-Open **Device → Software**. When an update is available, enter the security code
-and select **Install update**. Downloads are authenticated and verified before
+Open **Device → Software**. When an update is available, select **Install update**.
+No security code is requested. Downloads are authenticated and verified before
 installation. Existing setup, cameras, networks, passwords and enrollment are
 retained. The installer backs up the application and attempts rollback if startup
 fails. Keep the box powered on; rollback does not guarantee recovery from power
@@ -37,14 +38,17 @@ netifd/procd image. The installer selects the correct ARM64/ARMv7 binary, checks
 dependencies, and installs all missing packages through Debian `apt-get` or
 OpenWrt `apk`/`opkg` before replacing the console. Package installation is automatic;
 existing tools are reused. A package failure stops setup before console replacement.
-On vendor Debian it also installs the MediaMTX camera relay.
+On the four-port Radxa E24C vendor image it also installs the MediaMTX camera relay.
 This also upgrades boxes that do not yet have the update UI.
 
 ```sh
 curl -fsSL https://github.com/kaushalkchoudhary/orion-setup-releases/releases/latest/download/install.sh | sh
 ```
 
-Enter the release security code during first installation. The installer saves verified authorization in a root-only file so `orion-setup --update` does not prompt again. Older installations must supply `ORION_UPDATE_CODE` once to enable unattended updates.
+Enter the release security code during first installation. Subsequent updates
+reuse saved authorization or recover it from the installed published binary.
+Older/direct installations do not need a one-time code entry. Run
+`orion-setup --update` again to use the latest installer.
 
 For an unattended installation from a root shell, supply the code directly:
 
@@ -78,8 +82,8 @@ the helper prints its log/result paths.
 
 UI checks retry automatically after connectivity failures. Failed UI jobs keep
 logs under `/var/lib/magicbox-updates`; backups are under
-`/var/backups/orion-appliance`. Ask your administrator for the code for the chosen
-release; changing the code for a new release does not unlock older releases.
+`/var/backups/orion-appliance`. An unpublished/custom binary may not have an
+authorization record; published production binaries are registered automatically.
 
 ## Package format
 
@@ -92,6 +96,12 @@ fails authentication before the appliance executable is written or run.
 unlocking the package. They contain neither the appliance application nor the
 security code. The `.sha256` files verify their downloads. Only completed,
 tested builds become releases; boxes never install without an explicit action.
+
+`update-authorization.json` contains encrypted authorizations keyed by published
+binary checksums. Unlocking one requires a separate digest of the actual private
+executable; public checksums alone cannot authorize updates. The release job
+carries historical keys in `update-keyring.enc`, encrypted with the release secret.
+Neither asset exposes the release code or plaintext authorization keys.
 
 Legacy `radxa-*` assets and manifests remain for installed clients. Old GitHub
 repository URLs redirect to the Orion repositories. Existing data is migrated
