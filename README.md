@@ -1,4 +1,4 @@
-# MagicBox updates
+# Orion Setup updates
 
 Public **encrypted** updates for Linux ARM64 Radxa E20C/E24C/E52C and NanoPi R2C/R2C Plus,
 and Linux ARMv7 NanoPi R1S-H3.
@@ -6,6 +6,22 @@ The application source stays private. No GitHub account is needed to check for o
 download updates. Ask your administrator for the release security code.
 
 ## From the box UI
+
+After installing this release, terminal commands are available on PATH:
+
+```sh
+orion-setup              # device dashboard
+orion-setup --status     # same read-only dashboard
+orion-setup --update     # latest verified release
+orion-setup --uninstall  # keep settings and enrollment
+orion-setup --version
+orion-setup --help
+```
+
+The dashboard shows box/board serials, IP addresses, ports and observed clients,
+plus the VMS relay and camera inventory. Unknown camera state is labelled;
+status does not start streams or change network configuration. Privileged commands
+invoke sudo when needed. Commands use the `--command` form.
 
 Open **Device → Software**. When an update is available, enter the security code
 and select **Install update**. Downloads are authenticated and verified before
@@ -25,7 +41,7 @@ On vendor Debian it also installs the MediaMTX camera relay.
 This also upgrades boxes that do not yet have the update UI.
 
 ```sh
-curl -fsSL https://github.com/kaushalkchoudhary/radxa-setup-releases/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/kaushalkchoudhary/orion-setup-releases/releases/latest/download/install.sh | sh
 ```
 
 Enter the release security code when prompted. It is not written to disk.
@@ -33,7 +49,7 @@ Enter the release security code when prompted. It is not written to disk.
 For an unattended installation from a root shell, supply the code directly:
 
 ```sh
-curl -fsSL https://github.com/kaushalkchoudhary/radxa-setup-releases/releases/latest/download/install.sh | RADXA_UPDATE_CODE='YOUR_RELEASE_CODE' sh
+curl -fsSL https://github.com/kaushalkchoudhary/orion-setup-releases/releases/latest/download/install.sh | ORION_UPDATE_CODE='YOUR_RELEASE_CODE' sh
 ```
 
 The terminal shows release verification, dependency preparation, installation and
@@ -46,14 +62,14 @@ On Linux or macOS, download both scripts and run the SSH helper:
 ```sh
 tools_dir=$(mktemp -d)
 for script in install.sh deploy.sh; do
-  curl -fsSL "https://github.com/kaushalkchoudhary/radxa-setup-releases/releases/latest/download/$script" -o "$tools_dir/$script"
+  curl -fsSL "https://github.com/kaushalkchoudhary/orion-setup-releases/releases/latest/download/$script" -o "$tools_dir/$script"
 done
 sh "$tools_dir/deploy.sh" radxa@BOX_IP
 ```
 
 The box does not need GitHub access for this method. An offline box must already
 have all dependency packages installed.
-Use an SSH config alias for custom ports/keys. Set `RADXA_VERSION` to a release
+Use an SSH config alias for custom ports/keys. Set `ORION_VERSION` to a release
 tag to select a particular build. Helpers support ARM64/AMD64 Linux and macOS.
 Installation continues if restarting the console drops the SSH connection;
 the helper prints its log/result paths.
@@ -67,12 +83,16 @@ release; changing the code for a new release does not unlock older releases.
 
 ## Package format
 
-`manifest.json` identifies the source revision, release, sizes and SHA256 hashes.
+`orion-manifest.json` identifies the source revision, release, sizes and SHA256 hashes.
 The appliance executable is encrypted with AES-256-GCM using a fresh salt/nonce
 and PBKDF2-HMAC-SHA256 (600,000 iterations). A wrong code or changed ciphertext
 fails authentication before the appliance executable is written or run.
 
-`radxa-download-*` are small, unencrypted platform helpers for downloading and
+`orion-download-*` are small, unencrypted platform helpers for downloading and
 unlocking the package. They contain neither the appliance application nor the
 security code. The `.sha256` files verify their downloads. Only completed,
 tested builds become releases; boxes never install without an explicit action.
+
+Legacy `radxa-*` assets and manifests remain for installed clients. Old GitHub
+repository URLs redirect to the Orion repositories. Existing data is migrated
+with backup and rollback; compatibility links preserve old installation paths.
