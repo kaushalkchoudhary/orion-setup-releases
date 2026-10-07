@@ -1,6 +1,7 @@
 # MagicBox updates
 
-Public **encrypted** updates for Linux ARM64 Radxa E20C/E24C and NanoPi R2C/R2C Plus.
+Public **encrypted** updates for Linux ARM64 Radxa E20C/E24C/E52C and NanoPi R2C/R2C Plus,
+and Linux ARMv7 NanoPi R1S-H3.
 The application source stays private. No GitHub account is needed to check for or
 download updates. Ask your administrator for the release security code.
 
@@ -16,17 +17,27 @@ loss or restore all kernel/network changes. Confirm pending network changes firs
 ## Install directly on an online box
 
 Requires curl, SHA256 tools, root/sudo, and a supported NetworkManager/systemd or
-netifd/procd image with `ip`, `iptables`, `nft`, `wg` and `tc`. The installer checks
-prerequisites; it does not install missing system packages.
+netifd/procd image. The installer selects the correct ARM64/ARMv7 binary, checks
+dependencies, and installs all missing packages through Debian `apt-get` or
+OpenWrt `apk`/`opkg` before replacing the console. Package installation is automatic;
+existing tools are reused. A package failure stops setup before console replacement.
+On vendor Debian it also installs the MediaMTX camera relay.
 This also upgrades boxes that do not yet have the update UI.
 
 ```sh
-tools_dir=$(mktemp -d)
-curl -fsSL https://github.com/kaushalkchoudhary/radxa-setup-releases/releases/latest/download/install.sh -o "$tools_dir/install.sh"
-sh "$tools_dir/install.sh"
+curl -fsSL https://github.com/kaushalkchoudhary/radxa-setup-releases/releases/latest/download/install.sh | sh
 ```
 
 Enter the release security code when prompted. It is not written to disk.
+
+For an unattended installation from a root shell, supply the code directly:
+
+```sh
+curl -fsSL https://github.com/kaushalkchoudhary/radxa-setup-releases/releases/latest/download/install.sh | RADXA_UPDATE_CODE='YOUR_RELEASE_CODE' sh
+```
+
+The terminal shows release verification, dependency preparation, installation and
+startup verification as numbered stages. Color is automatic; `NO_COLOR=1` disables it.
 
 ## Send an update from a laptop
 
@@ -40,7 +51,8 @@ done
 sh "$tools_dir/deploy.sh" radxa@BOX_IP
 ```
 
-The box does not need internet access or GitHub credentials for this method.
+The box does not need GitHub access for this method. An offline box must already
+have all dependency packages installed.
 Use an SSH config alias for custom ports/keys. Set `RADXA_VERSION` to a release
 tag to select a particular build. Helpers support ARM64/AMD64 Linux and macOS.
 Installation continues if restarting the console drops the SSH connection;
