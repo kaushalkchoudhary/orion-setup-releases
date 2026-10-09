@@ -50,6 +50,7 @@ jobs:
         working-directory: source
         env:
           RELEASE_CODE: ${{ secrets.RELEASE_CODE }}
+          ORION_ENROLLMENT_TOKEN: ${{ secrets.ORION_ENROLLMENT_TOKEN }}
           RELEASE_TAG: ${{ steps.source.outputs.tag }}
           ORION_PUBLIC_GO_CACHE: ${{ runner.temp }}/orion-public-go-cache
           GOCACHE: ${{ runner.temp }}/orion-private-go-cache
