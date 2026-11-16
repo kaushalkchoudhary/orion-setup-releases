@@ -44,3 +44,22 @@ Supported Debian images use NetworkManager/systemd; OpenWrt uses netifd/procd an
 Console: port **8088**, including `10.99.x.x` and `10.10.x.x` management VPN addresses. Direct LAN/supported USB device mode uses `http://192.168.30.1:8088`.
 
 Update logs: `/var/lib/magicbox-updates`. Backups: `/var/backups/orion-appliance`. Use `ORION_VERSION=build-COMMIT` to pin an installer release. Unpublished custom binaries may need initial authorization.
+
+## Release maintenance
+
+Before proposing a change to `source-commit`, check the file locally:
+
+```sh
+bash .github/scripts/check-source-commit.sh
+```
+
+The file must contain one full, lowercase 40-character source revision, with at
+most one trailing newline. Run the validator's isolated fixtures with:
+
+```sh
+bash .github/scripts/check-source-commit.test.sh
+```
+
+This preflight checks the revision's format only. The protected publishing
+workflow still checks out and builds the private source; these scripts do not
+need its credentials or publish a release.
